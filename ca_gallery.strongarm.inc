@@ -137,13 +137,12 @@ function ca_gallery_strongarm() {
   $strongarm->name = 'content_extra_weights_ca_gallery';
   $strongarm->value = array(
     'title' => '-5',
-    'body_field' => '0',
-    'revision_information' => '20',
-    'author' => '20',
-    'options' => '25',
-    'comment_settings' => '30',
-    'menu' => '-2',
-    'path' => '30',
+    'body_field' => '-2',
+    'revision_information' => '-1',
+    'author' => '0',
+    'options' => '1',
+    'menu' => '-3',
+    'path' => '2',
   );
 
   $export['content_extra_weights_ca_gallery'] = $strongarm;
@@ -157,12 +156,18 @@ function ca_gallery_strongarm() {
     'revision_information' => '-1',
     'author' => '0',
     'options' => '1',
-    'comment_settings' => '2',
     'menu' => '-2',
     'path' => '3',
   );
 
   $export['content_extra_weights_ca_gallery_image'] = $strongarm;
+  $strongarm = new stdClass;
+  $strongarm->disabled = FALSE; /* Edit this to true to make a default strongarm disabled initially */
+  $strongarm->api_version = 1;
+  $strongarm->name = 'form_build_id_ca_gallery';
+  $strongarm->value = 'form-a479a641f379334f82fa916bd6b5a981';
+
+  $export['form_build_id_ca_gallery'] = $strongarm;
   $strongarm = new stdClass;
   $strongarm->disabled = FALSE; /* Edit this to true to make a default strongarm disabled initially */
   $strongarm->api_version = 1;
@@ -181,5 +186,19 @@ function ca_gallery_strongarm() {
   );
 
   $export['node_options_ca_gallery_image'] = $strongarm;
+  $strongarm = new stdClass;
+  $strongarm->disabled = FALSE; /* Edit this to true to make a default strongarm disabled initially */
+  $strongarm->api_version = 1;
+  $strongarm->name = 'pathauto_node_ca_gallery_image_pattern';
+  $strongarm->value = '[ca-gallery-parent-node-reference-path]/[title-raw]';
+
+  $export['pathauto_node_ca_gallery_image_pattern'] = $strongarm;
+  $strongarm = new stdClass;
+  $strongarm->disabled = FALSE; /* Edit this to true to make a default strongarm disabled initially */
+  $strongarm->api_version = 1;
+  $strongarm->name = 'pathauto_node_ca_gallery_pattern';
+  $strongarm->value = '[ca-gallery-parent-node-reference-path]/[title-raw]';
+
+  $export['pathauto_node_ca_gallery_pattern'] = $strongarm;
   return $export;
 }

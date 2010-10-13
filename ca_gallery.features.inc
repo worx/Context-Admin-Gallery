@@ -14,6 +14,30 @@ function ca_gallery_ctools_plugin_api() {
 }
 
 /**
+ * Implementation of hook_imagecache_default_presets().
+ */
+function ca_gallery_imagecache_default_presets() {
+  $items = array(
+    'ca_gallery_images' => array(
+      'presetname' => 'ca_gallery_images',
+      'actions' => array(
+        '0' => array(
+          'weight' => '0',
+          'module' => 'imagecache',
+          'action' => 'imagecache_scale',
+          'data' => array(
+            'width' => '200',
+            'height' => '',
+            'upscale' => 0,
+          ),
+        ),
+      ),
+    ),
+  );
+  return $items;
+}
+
+/**
  * Implementation of hook_node_info().
  */
 function ca_gallery_node_info() {
@@ -24,8 +48,8 @@ function ca_gallery_node_info() {
       'description' => '',
       'has_title' => '1',
       'title_label' => t('Title'),
-      'has_body' => '1',
-      'body_label' => t('Body'),
+      'has_body' => '0',
+      'body_label' => '',
       'min_word_count' => '0',
       'help' => '',
     ),

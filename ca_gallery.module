@@ -1,3 +1,73 @@
 <?php
 
 include_once('ca_gallery.features.inc');
+drupal_add_css(drupal_get_path('module', 'ca_gallery') . "/ca_gallery.css", 'module', 'all', FALSE);
+
+/**
+ * Implementation of hook_token_list().
+ */
+function ca_gallery_token_list($type = 'all') {
+  $tokens = array();
+  
+  if ($type == 'node' || $type == 'all') {
+    // Node tokens here.
+    $tokens['node']['ca-gallery-parent-node-reference-path']  = t("WARNING: This token expects a particular node reference field. This should never be used outside of the ca_gallery feature.");
+  }
+
+  return $tokens;
+}
+
+/**
+ * Implementation of hook_token_values().
+ */
+function ca_gallery_token_values($type, $object = NULL) {
+  $values = array();
+  switch ($type) {
+    case 'node':
+      // Node tokens here.
+      $parent_node_id = $object->field_ca_gal_parent_gallery['0']['nid'];
+      $parent_node = node_load($parent_node_id);
+      $parent_node_path = $parent_node->path;
+      $values['ca-gallery-parent-node-reference-path'] = $parent_node_path;
+      break;
+  }
+  return $values;
+}
+
+/*
+ * Implementation of hook_ctools_render_alter($info, $page, $args, $contexts, $task, $subtask).
+ *
+ * Overriding the breadcrumbs for the taxonomy term pages.
+ */
+function ca_gallery_ctools_render_alter($info, $page, $args, $contexts, $task, $subtask){
+  if($task['name'] == 'node_view' && $contexts['argument_nid_1']->data->type == 'ca_gallery'){
+    $subject = $_SERVER['REQUEST_URI'];
+    
+    $l1 = ltrim($subject, '/');
+    
+    $breadcrumb_array = explode('/', $l1);
+    $array_count = count($breadcrumb_array);
+    
+    $array_count--;
+    
+    $bc = array();
+    $bc[] = l(t('home'), '<front>');
+    
+    $i = 0;
+    $url = '';
+    $url_title = '';
+    while($i <= $array_count){
+      $url .= $breadcrumb_array[$i] . '/';
+      $url_title = $breadcrumb_array[$i];
+      $breadcrumb_title = str_replace('-', ' ', $url_title);
+      if($i != $array_count){
+        $bc[] = l($breadcrumb_title, $url);
+      } else {
+        $bc[] = $breadcrumb_title;
+      }
+      $i++;
+    }
+    
+    drupal_set_breadcrumb($bc);
+  }
+}
