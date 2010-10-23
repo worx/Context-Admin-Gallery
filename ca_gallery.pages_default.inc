@@ -107,7 +107,10 @@ function ca_gallery_default_page_manager_pages() {
   $page->admin_title = 'Gallery';
   $page->admin_description = '';
   $page->path = 'gallery/view';
-  $page->access = array();
+  $page->access = array(
+    'type' => 'none',
+    'settings' => NULL,
+  );
   $page->menu = array(
     'type' => 'default tab',
     'title' => 'View',
@@ -197,7 +200,7 @@ function ca_gallery_default_page_manager_pages() {
         'not' => FALSE,
       ),
     ),
-    'logic' => 'and',
+    'logic' => 'or',
     'type' => 'none',
     'settings' => NULL,
   );
@@ -353,6 +356,8 @@ function ca_gallery_default_page_manager_pages() {
       ),
     ),
     'logic' => 'and',
+    'type' => 'none',
+    'settings' => NULL,
   );
   $page->menu = array(
     'type' => 'tab',
@@ -423,6 +428,8 @@ function ca_gallery_default_page_manager_pages() {
       ),
     ),
     'logic' => 'and',
+    'type' => 'none',
+    'settings' => NULL,
   );
   $page->menu = array(
     'type' => 'default tab',
@@ -514,6 +521,8 @@ function ca_gallery_default_page_manager_pages() {
       ),
     ),
     'logic' => 'and',
+    'type' => 'none',
+    'settings' => NULL,
   );
   $page->menu = array(
     'type' => 'tab',
@@ -615,6 +624,8 @@ function ca_gallery_default_page_manager_pages() {
       ),
     ),
     'logic' => 'and',
+    'type' => 'none',
+    'settings' => NULL,
   );
   $page->menu = array(
     'type' => 'default tab',
@@ -723,6 +734,8 @@ function ca_gallery_default_page_manager_pages() {
       ),
     ),
     'logic' => 'and',
+    'type' => 'none',
+    'settings' => NULL,
   );
   $page->menu = array(
     'type' => 'tab',

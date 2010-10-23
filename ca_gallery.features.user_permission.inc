@@ -9,13 +9,17 @@ function ca_gallery_user_default_permissions() {
   // Exported permission: create ca_gallery content
   $permissions['create ca_gallery content'] = array(
     'name' => 'create ca_gallery content',
-    'roles' => array(),
+    'roles' => array(
+      '0' => 'authenticated user',
+    ),
   );
 
   // Exported permission: create ca_gallery_image content
   $permissions['create ca_gallery_image content'] = array(
     'name' => 'create ca_gallery_image content',
-    'roles' => array(),
+    'roles' => array(
+      '0' => 'authenticated user',
+    ),
   );
 
   // Exported permission: delete any ca_gallery content

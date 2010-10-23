@@ -35,7 +35,7 @@ function ca_gallery_content_default_fields() {
     ),
     'widget_active' => '1',
     'type' => 'filefield',
-    'required' => '1',
+    'required' => '0',
     'multiple' => '0',
     'module' => 'filefield',
     'active' => '1',

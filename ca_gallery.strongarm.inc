@@ -165,7 +165,7 @@ function ca_gallery_strongarm() {
   $strongarm->disabled = FALSE; /* Edit this to true to make a default strongarm disabled initially */
   $strongarm->api_version = 1;
   $strongarm->name = 'form_build_id_ca_gallery';
-  $strongarm->value = 'form-a479a641f379334f82fa916bd6b5a981';
+  $strongarm->value = 'form-cdf920ac91a78b5d5a9b0dd1e9c258ba';
 
   $export['form_build_id_ca_gallery'] = $strongarm;
   $strongarm = new stdClass;

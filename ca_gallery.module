@@ -1,14 +1,68 @@
 <?php
 
 include_once('ca_gallery.features.inc');
-drupal_add_css(drupal_get_path('module', 'ca_gallery') . "/ca_gallery.css", 'module', 'all', FALSE);
+
+function ca_gallery_menu() {
+  $items = array();
+
+  $items['node/%node/admin/settings'] = array(
+    'title' => 'Settings',
+    'type' => MENU_LOCAL_TASK,
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('ca_gallery_gallery_settings', 1),
+    'access callback' => 'ca_gallery_gallery_settings_access',
+    'access arguments' => array(1),
+  );
+
+  return $items;
+}
+
+function ca_gallery_gallery_settings($form_state, $node) {
+  $form = array();
+
+  $form['node'] = array(
+    '#type' => 'value',
+    '#value' => $node,
+  );
+  $form['gallery_settings'] = array(
+    '#type' => 'radios',
+    '#title' => t('Gallery Settings'),
+    '#options' => array(
+      'first' => t('Oldest Image'),
+      'last' => t('Newest Image'),
+    ),
+    '#default_value' => variable_get('ca_gallery_'. $node->nid .'_gallery_settings', 'last'),
+  );
+  $form['submit'] = array(
+    '#type' => 'submit',
+    '#value' => t('Save'),
+  );
+  return $form;
+}
+
+function ca_gallery_gallery_settings_submit($form, &$form_state) {
+  variable_set('ca_gallery_'. $form_state['values']['node']->nid .'_gallery_settings', $form_state['values']['gallery_settings']);
+  drupal_set_message(t('Your configuration has been saved'));
+}
+
+function ca_gallery_gallery_settings_access($node) {
+  global $user;
+  if ($user->uid == $node->uid) {
+    return TRUE;
+  }
+  return user_access('administer ca_gallery galleries');
+}
+
+function ca_gallery_perm() {
+  return array('administer ca_gallery galleries');
+}
 
 /**
  * Implementation of hook_token_list().
  */
 function ca_gallery_token_list($type = 'all') {
   $tokens = array();
-  
+
   if ($type == 'node' || $type == 'all') {
     // Node tokens here.
     $tokens['node']['ca-gallery-parent-node-reference-path']  = t("WARNING: This token expects a particular node reference field. This should never be used outside of the ca_gallery feature.");
@@ -34,40 +88,61 @@ function ca_gallery_token_values($type, $object = NULL) {
   return $values;
 }
 
+function ca_gallery_get_parent_galleries($node) {
+  $nodes = array();
+  if ($node->field_ca_gal_parent_gallery[0]['nid']) {
+    $new_node = node_load($node->field_ca_gal_parent_gallery[0]['nid']);
+    $nodes[$new_node->nid] = $new_node;
+    $nodes += ca_gallery_get_parent_galleries($new_node);
+  }
+  return $nodes;
+}
+
 /*
  * Implementation of hook_ctools_render_alter($info, $page, $args, $contexts, $task, $subtask).
  *
  * Overriding the breadcrumbs for the taxonomy term pages.
  */
 function ca_gallery_ctools_render_alter($info, $page, $args, $contexts, $task, $subtask){
-  if($task['name'] == 'node_view' && $contexts['argument_nid_1']->data->type == 'ca_gallery'){
-    $subject = $_SERVER['REQUEST_URI'];
-    
-    $l1 = ltrim($subject, '/');
-    
-    $breadcrumb_array = explode('/', $l1);
-    $array_count = count($breadcrumb_array);
-    
-    $array_count--;
-    
+  $node = $contexts['argument_nid_1']->data;
+  if($task['name'] == 'node_view' && $node->type == 'ca_gallery'){
+    drupal_add_css(drupal_get_path('module', 'ca_gallery') . "/ca_gallery.css", 'module', 'all', FALSE);
     $bc = array();
-    $bc[] = l(t('home'), '<front>');
-    
-    $i = 0;
-    $url = '';
-    $url_title = '';
-    while($i <= $array_count){
-      $url .= $breadcrumb_array[$i] . '/';
-      $url_title = $breadcrumb_array[$i];
-      $breadcrumb_title = str_replace('-', ' ', $url_title);
-      if($i != $array_count){
-        $bc[] = l($breadcrumb_title, $url);
-      } else {
-        $bc[] = $breadcrumb_title;
+    $bc[] = l(t('Home'), '<front>');
+    $nodes = array();
+    $nodes[$node->nid] = $node;
+    $nodes += ca_gallery_get_parent_galleries($node);
+    $nodes = array_reverse($nodes);
+    foreach ($nodes as $node_item) {
+      if ($node_item->nid == $node->nid) {
+        $bc[] = t($node->title);
       }
-      $i++;
+      else {
+        $bc[] = l($node_item->title, 'node/'. $node_item->nid);
+      }
     }
-    
     drupal_set_breadcrumb($bc);
   }
 }
+
+function ca_gallery_nodeapi(&$node, $op, $a3, $a4) {
+  if ($node->type == 'ca_gallery_image') {
+    if ($op == 'insert') {
+      $parent_gallery = node_load($node->field_ca_gal_parent_gallery[0]['nid']);
+      if (variable_get('ca_gallery_'. $parent_gallery->nid .'_gallery_settings', 'last') == 'last') {
+        module_load_include('inc', 'filefield', 'field_file');
+        $file = field_file_load($node->field_ca_gal_image[0]['fid']);
+        $parent_gallery->field_ca_gal_display_image[0] = $file;
+        node_save($parent_gallery);
+      }
+      // doesn't support first yet, need to db_query against nodes to find out if there is more than one node referencing the parent.  If there is, do nothing, if there is only one referencing, then it is this node, and we need to node save the parent.
+    }
+  }
+}
+
+function ca_gallery_form_alter(&$form, $form_state, $form_id) {
+  if ($form_id == 'ca_gallery_node_form') {
+    $form['field_ca_gal_display_image']['#access'] = FALSE;
+  }
+}
+
